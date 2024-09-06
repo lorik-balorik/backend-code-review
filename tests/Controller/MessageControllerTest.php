@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Controller;
+namespace App\Tests\Controller;
 
 use App\Message\SendMessage;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -13,13 +13,21 @@ class MessageControllerTest extends WebTestCase
     
     function test_list(): void
     {
-        $this->markTestIncomplete('the Controller-Action needs tests');
+        $client = static::createClient();
+        $client->request('GET', '/messages', [
+            'status' => 'sent',
+            'order_by[created_at]' => 'desc',
+            'limit' => 2,
+            'offset' => 0,
+        ]);
+        
+        $this->assertResponseIsSuccessful();
     }
     
     function test_that_it_sends_a_message(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/messages/send', [
+        $client->request('POST', '/messages/send', [
             'text' => 'Hello World',
         ]);
 

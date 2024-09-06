@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\Message;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @extends ServiceEntityRepository<Message>
@@ -22,20 +21,20 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
     
-    public function by(Request $request): array
+// name of the method should be understandable
+    /**
+     * @param string $status
+     * @return mixed
+     */
+    public function findByStatus(string $status): mixed
     {
-        $status = $request->query->get('status');
-        
-        if ($status) {
-            $messages = $this->getEntityManager()
-                ->createQuery(
-                    sprintf("SELECT m FROM App\Entity\Message m WHERE m.status = '%s'", $status)
-                )
-                ->getResult();
-        } else {
-            $messages = $this->findAll();
-        }
-        
-        return $messages;
+        $qb = $this->createQueryBuilder('m');
+
+// usage of sprintf method leads to SQL injection issue
+            $qb
+                ->where('m.status = :status')
+                ->setParameter('status', $status);
+
+        return $qb->getQuery()->execute();
     }
 }

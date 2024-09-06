@@ -1,19 +1,23 @@
 <?php
 declare(strict_types=1);
 
-namespace Repository;
+namespace App\Tests\Repository;
 
+use App\Entity\Message;
 use App\Repository\MessageRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class MessageRepositoryTest extends KernelTestCase
 {
-    public function test_it_has_connection(): void
+    public function test_find_all_returns_correct_data(): void
     {
         self::bootKernel();
         
-        $messages = self::getContainer()->get(MessageRepository::class);
+        /** @var MessageRepository $messageRepository*/
+        $messageRepository = self::getContainer()->get(MessageRepository::class);
         
-        $this->assertSame([], $messages->findAll());
+        $result = $messageRepository->findAll();
+        
+        $this->assertInstanceOf(Message::class, $result[0]);
     }
 }
